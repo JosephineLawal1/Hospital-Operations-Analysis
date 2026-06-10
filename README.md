@@ -63,6 +63,39 @@ This project provides a **data-driven framework** to optimize staffing, improve 
 
 ## 📂 Repository Structure
 
+care-continuity-provider-workload/
+│
+├── data/
+│   └── patient_encounters.csv
+│
+├── notebooks/
+│   ├── 01_data_cleaning.ipynb
+│   ├── 02_provider_workload_analysis.ipynb
+│   ├── 03_continuity_of_care.ipynb
+│   ├── 04_operational_insights.ipynb
+│   └── 05_dashboard_dataset.ipynb
+│
+├── sql/
+│   ├── provider_workload.sql
+│   ├── continuity_of_care.sql
+│   ├── encounter_volume.sql
+│   └── high_utilizers.sql
+│
+├── dashboard/
+│   ├── powerbi_wireframe.txt
+│   └── tableau_wireframe.txt
+│
+├── reports/
+│   ├── Care_Continuity_Operational_Report.md
+│   └── Executive_Summary.md
+│
+└── src/
+├── utils.py
+├── preprocessing.py
+├── workload_metrics.py
+├── continuity_metrics.py
+└── visualization.p
+
 
 ---
 
@@ -124,4 +157,65 @@ SELECT
     COUNT(*) AS encounter_count,
     AVG(DATEDIFF(minute, start_time, end_time)) AS avg_encounter_duration
 FROM encounters
-GROUP BY provider_id;
+GROUP BY provider_id; 
+```
+## 📊 Example SQL: Continuity of Care (UPC Score)
+
+```sql
+WITH provider_counts AS (
+    SELECT 
+        patient_id,
+        doctor_id,
+        COUNT(*) AS encounters_with_provider
+    FROM encounters
+    GROUP BY patient_id, doctor_id
+),
+totals AS (
+    SELECT 
+        patient_id,
+        SUM(encounters_with_provider) AS total_encounters,
+        MAX(encounters_with_provider) AS max_provider_encounters
+    FROM provider_counts
+    GROUP BY patient_id
+)
+SELECT 
+    patient_id,
+    CAST(max_provider_encounters AS FLOAT) / total_encounters AS continuity_score
+FROM totals;
+```
+---
+
+## 📄 Reports
+
+The reports/ folder includes:
+   - 4‑page operational business report
+   - Executive summary
+   - Recommendations for leadership
+---
+
+## 🚀 How to Run the Project
+
+1. Clone the repository
+2. Place the patient encounter dataset in data/
+3. Run notebooks in order:
+   - 01_data_cleaning.ipynb
+   - 02_provider_workload_analysis.ipynb
+   - 03_continuity_of_care.ipynb
+   - 04_operational_insights.ipynb
+4. Generate dashboard dataset using 05_dashboard_dataset.ipynb
+5. Build dashboard in Power BI or Tableau
+
+---
+
+📬 Contact
+For questions or collaboration:
+Josephine — Healthcare Data Analyst  
+San Antonio, TX
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Python-3.8+-blue?logo=python&logoColor=white" alt="Python Badge"/>
+  <img src="https://img.shields.io/badge/SQL-Analytics%20SQL-orange?logo=postgresql&logoColor=white" alt="SQL Badge"/>
+  <img src="https://img.shields.io/badge/Power%20BI-Dashboards-F2C811?logo=powerbi&logoColor=black" alt="Power BI Badge"/>
+  <img src="https://img.shields.io/badge/Tableau-Visualization-005F9E?logo=tableau&logoColor=white" alt="Tableau Badge"/>
+  <img src="https://img.shields.io/badge/Healthcare%20Analytics-Operational%20Insights-brightgreen" alt="Healthcare Analytics Badge"/>
+</p>
